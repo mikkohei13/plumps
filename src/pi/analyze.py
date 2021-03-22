@@ -35,7 +35,7 @@ def handleFrame(frame, background_frame, directory, filename, saveCrops, saveIma
     frameColor = frame # Preserve color image
 
 
-    # Thre are two options for detecting changed pixels:
+    # There are two options for detecting changed pixels:
 
     # A) Absolute difference in grayscale image
     # This finds also objects that are lighter than sky, but leaves redundant areas on the crops, where bird disappeared compared to previous image.
