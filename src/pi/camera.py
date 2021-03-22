@@ -57,9 +57,9 @@ def main():
                 analyze.handleFrame(frame, prevFrame, imagesFolder, datetimeStr, False, True, width, height)
 
             # Finalize
-            elapsed_sec = (time.time() - start_ms) * 1000
-            secPerFrame = elapsed_sec / x
-            print(secPerFrame, " s per frame")
+            elapsed_ms = (time.time() - start_ms) * 1000
+            msPerFrame = elapsed_ms / x
+            print(int(msPerFrame), "ms per frame")
 
             prevFrame = frame
             havePreviousFrame = True
