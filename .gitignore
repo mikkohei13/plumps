@@ -3,6 +3,10 @@
 src/helper/source_images/
 src/helper/crops/
 src/pi/crops/
+src/pi/test/
+src/pi/fulls/
+
+*_OLD*
 
 
 # Byte-compiled / optimized / DLL files

@@ -1,0 +1,11 @@
+cormon
+aves
+flock
+blur
+empty
+picpic
+ribbon
+insecta
+larus
+obstacle
+aircraft

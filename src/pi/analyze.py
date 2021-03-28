@@ -2,9 +2,17 @@
 from datetime import datetime
 
 import cv2
-import numpy as np
+#import numpy as np
 
 def calculateCropSize(xMin, xMax, yMin, yMax):
+
+    cropWidth = xMax - xMin
+    cropHeight = yMax - yMin
+
+    return cropWidth, cropHeight
+
+
+def calculateCropSize_SKIP_LARGE(xMin, xMax, yMin, yMax):
 
     # Set max size for crop to be saved. Anything larger than this is skipped, in order not to get lot of full sky images without objects. Allow large images in order to get training material of empty sky.
     maxWidth = 400
@@ -15,14 +23,20 @@ def calculateCropSize(xMin, xMax, yMin, yMax):
 
     if (cropWidth > maxWidth or cropHeight > maxHeight):
         continueProcess = False
-        print("Skipping  image size ", cropWidth, maxHeight)
+        print("Skipping  image size ", cropWidth, cropHeight)
     else:
         continueProcess = True
 
     return continueProcess, cropWidth, cropHeight
 
 
-def handleFrame(frame, background_frame, directory, filename, saveCrops, saveImages, width, height):
+def handleFrame(frame, background_frame, directory, filename, returnCrop, width, height, frameNumber):
+
+    # Save every nth frame
+    if (frameNumber % 2000 == 0):
+        fullFrameFilename = "./fulls/" + filename + ".jpg"
+        cv2.imwrite(fullFrameFilename, frame)
+
     """
     Use OpenCV to detect areas in frame that differ from background_frame
     """
@@ -117,9 +131,9 @@ def handleFrame(frame, background_frame, directory, filename, saveCrops, saveIma
     yMax = max(allY)
 
 
-    continueProcess, cropWidth, cropHeight = calculateCropSize(xMin, xMax, yMin, yMax)
-    if not continueProcess:
-        return True
+    cropWidth, cropHeight = calculateCropSize(xMin, xMax, yMin, yMax)
+#    if not continueProcess:
+#        return True
 
 
     # Advanced padding
@@ -143,9 +157,9 @@ def handleFrame(frame, background_frame, directory, filename, saveCrops, saveIma
         yMax = height
 
 
-    continueProcess, cropWidth, cropHeight = calculateCropSize(xMin, xMax, yMin, yMax)
-    if not continueProcess:
-        return True
+#    continueProcess, cropWidth, cropHeight = calculateCropSize(xMin, xMax, yMin, yMax)
+#    if not continueProcess:
+#        return True
 
 
     # If smaller than target size, add more padding
@@ -179,13 +193,21 @@ def handleFrame(frame, background_frame, directory, filename, saveCrops, saveIma
 #    print("After padding: ", xMin, xMax, yMin, yMax)
 
 
-    continueProcess, cropWidth, cropHeight = calculateCropSize(xMin, xMax, yMin, yMax)
-    if not continueProcess:
+#    continueProcess, cropWidth, cropHeight = calculateCropSize(xMin, xMax, yMin, yMax)
+#    if not continueProcess:
+#        return True
+
+    # Here cropFrame is Numpy array
+    cropFrame = frameColor[yMin:yMax, xMin:xMax]
+
+    if returnCrop:
+        print("returning frame")
+        return cropFrame
+
+    else:
+        cropFilePath = directory + filename + "_crop.jpg"
+        cv2.imwrite(cropFilePath, cropFrame)
+        print("wrote frame")
         return True
 
-    cropFrame = frameColor[yMin:yMax, xMin:xMax]
-    cropFilePath = directory + filename + "_crop.jpg"
-    cv2.imwrite(cropFilePath, cropFrame)
-
-    return True
 
