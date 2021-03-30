@@ -63,10 +63,38 @@ def classify_image(interpreter, image, top_k=1):
   # If the model is quantized (uint8 data), then dequantize the results
   if output_details['dtype'] == np.uint8:
     scale, zero_point = output_details['quantization']
+
+    # "output" is list of probablilities, in the same order as labels are in dict.txt
     output = scale * (output - zero_point)
 
+  # "ordered" is list of numbers that show the order of each probability in "output"
   ordered = np.argpartition(-output, top_k)
-  return [(i, output[i]) for i in ordered[:top_k]]
+
+#  print("ordered ", ordered)
+#  print("output", output)
+
+#  best = ordered[0]
+#  all = [(labels[i], output[i]) for i in ordered[:top_k]]
+#  print(best, all)
+
+  return output
+#  return ordered # labels
+#  return output
+
+
+def formatOutput(output, labels):
+  all = {}
+  labelNumber = 0
+  for i in output:
+    all[labels[labelNumber]] = i
+    labelNumber = labelNumber + 1
+
+  bestKey = max(all, key=lambda key: all[key])
+  bestVal = all[bestKey]
+#  print("best", best)
+  # TODO: return best key and value as second return value
+
+  return bestKey, bestVal, all
 
 
 # Main function
@@ -77,8 +105,12 @@ def classify(cropFrame):
 #    height = 224
 
     # Hardcoded args
-    model = './models/tflite-plumps1_20210328/model.tflite'
-    labels = './models/tflite-plumps1_20210328/dict.txt'
+#    model = './models/tflite-plumps1_20210328/model.tflite'
+#    labels = './models/tflite-plumps1_20210328/dict.txt'
+
+    model = './models/tflite-plumps2_20210330/model.tflite'
+    labels = './models/tflite-plumps2_20210330/dict.txt'
+
 
     # TODO: Do this only once, pass to the function?
     labels = load_labels(labels)
@@ -92,11 +124,15 @@ def classify(cropFrame):
 
 #    success = saveImageSimple(cropImage) # test
 
-    results = classify_image(interpreter, cropImage)
+    results = classify_image(interpreter, cropImage, 1)
+#    print("Results array ", results)
 
-    label_id, prob = results[0]
+    bestKey, bestVal, all = formatOutput(results, labels)
+    print("res: ", bestKey, bestVal, all)
 
-    print(labels[label_id], prob)
+#    label_id, prob = results[0]
 
-    return labels[label_id], prob
+#    print(labels[label_id], prob)
 
+#    return labels[label_id], prob
+    return bestKey, bestVal, all

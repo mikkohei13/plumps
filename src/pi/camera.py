@@ -55,7 +55,9 @@ def main():
         start_ms = time.time()
 
         for piImage in camera.capture_continuous(rawCapture, format="bgr", use_video_port=True):
-            # TODO: Here image is bgr, TF expects RGB. Problem?
+            # Note: using format=rgb results in orange sky
+            # TODO: Test saving photo to see what kind the model gets
+
             print("frame ", x)
             frame = piImage.array
  
@@ -80,12 +82,23 @@ def main():
 
                 '''
 
-                label, prob = classify.classify(cropFrame)
+                bestKey, bestVal, all = classify.classify(cropFrame)
 
-#                if "empty" != label:
-                saveFrame(cropFrame, imagesFolder, datetimeStr, label, prob)
+                # TODO: sum bird values
+
+                if bestKey != "empty":
+                    saveFrame(cropFrame, imagesFolder, datetimeStr, bestKey, bestVal)
+                elif all['empty'] < 0.6:
+                    saveFrame(cropFrame, imagesFolder, datetimeStr, bestKey, bestVal)
+
+#                if "empty" == bestKey:
+#                    if bestVal < 0.5:
+#                        saveFrame(cropFrame, imagesFolder, datetimeStr, bestKey, bestVal)
+#                elif "obstacle" == bestKey:
+#                    if bestVal < 0.5:
+#                        saveFrame(cropFrame, imagesFolder, datetimeStr, bestKey, bestVal)
 #                else:
-#                    print("empty")
+#                    saveFrame(cropFrame, imagesFolder, datetimeStr, bestKey, bestVal)
 
 
             # Finalize

@@ -15,8 +15,8 @@ def calculateCropSize(xMin, xMax, yMin, yMax):
 def calculateCropSize_SKIP_LARGE(xMin, xMax, yMin, yMax):
 
     # Set max size for crop to be saved. Anything larger than this is skipped, in order not to get lot of full sky images without objects. Allow large images in order to get training material of empty sky.
-    maxWidth = 400
-    maxHeight = 400
+    maxWidth = 4000
+    maxHeight = 4000
 
     cropWidth = xMax - xMin
     cropHeight = yMax - yMin
